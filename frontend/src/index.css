@@ -119,6 +119,7 @@ textarea { resize: vertical; min-height: 80px; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 .navbar-brand {
   display: flex;
@@ -127,6 +128,29 @@ textarea { resize: vertical; min-height: 80px; }
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--text);
+  white-space: nowrap;
+}
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.navbar-nav-link {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+.navbar-nav-link:hover {
+  color: var(--text);
+  background: var(--surface2);
+  text-decoration: none;
+}
+.navbar-nav-link.active {
+  color: var(--accent-light);
+  background: var(--surface2);
 }
 
 /* ─── Story card list ────────────────────────────────────────────────────── */

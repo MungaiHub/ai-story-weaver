@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronRight, PlusCircle, Lightbulb, Info } from 'lucide-react';
+import { BookOpen, ChevronRight, PlusCircle } from 'lucide-react';
 import { sanitize } from '../utils/sanitize';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,8 +11,6 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Dashboard fetches aren't in the current API spec (no GET /api/story list
-  // endpoint). We detect this gracefully and show the empty state + CTA.
   useEffect(() => {
     setLoading(false);
   }, []);
@@ -27,49 +25,6 @@ export default function DashboardPage() {
         <p style={{ color: 'var(--muted)', fontSize: '0.88rem', marginTop: '0.3rem' }}>
           Pick up where you left off, or start something new.
         </p>
-      </div>
-
-      {/* ── Quick action cards ───────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-        <div
-          className="quick-card"
-          onClick={() => navigate('/generate')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && navigate('/generate')}
-        >
-          <PlusCircle size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>New Story</div>
-            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>Generate a new story with AI</div>
-          </div>
-        </div>
-        <div
-          className="quick-card"
-          onClick={() => navigate('/how-it-works')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && navigate('/how-it-works')}
-        >
-          <Lightbulb size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>How It Works</div>
-            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>Learn about AI story branching</div>
-          </div>
-        </div>
-        <div
-          className="quick-card"
-          onClick={() => navigate('/about')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && navigate('/about')}
-        >
-          <Info size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>About</div>
-            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>About this project</div>
-          </div>
-        </div>
       </div>
 
       <div
