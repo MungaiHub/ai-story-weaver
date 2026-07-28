@@ -4,6 +4,7 @@
  * Single abstraction layer for all LLM calls.
  * Switch provider by setting LLM_PROVIDER in .env:
  *   openai     — OpenAI Chat Completions (default)
+ *   gemini     — Google Gemini (@google/genai SDK)
  *   anthropic  — Anthropic Messages API  (stub, swap in SDK)
  *   stub       — Returns deterministic fake text; useful for offline dev/testing
  *
@@ -30,6 +31,58 @@ async function callOpenAI(messages, opts = {}) {
   return response.choices[0].message.content.trim();
 }
 
+async function callGemini(messages, opts = {}) {
+  const { GoogleGenAI } = require('@google/genai');
+  const { GEMINI_FALLBACK_MODELS } = require('../config/validateLlm');
+  const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+  const systemMsg = messages.find((m) => m.role === 'system');
+  const userMessages = messages.filter((m) => m.role !== 'system');
+
+  const preferred = process.env.GEMINI_MODEL || GEMINI_FALLBACK_MODELS[0];
+  const modelCandidates = [preferred, ...GEMINI_FALLBACK_MODELS.filter((m) => m !== preferred)];
+
+  const history = [];
+  for (let i = 0; i < userMessages.length - 1; i++) {
+    const m = userMessages[i];
+    history.push({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    });
+  }
+
+  const lastUser = userMessages[userMessages.length - 1];
+  const generationConfig = {
+    temperature: opts.temperature ?? 0.85,
+    maxOutputTokens: opts.maxTokens ?? 1200,
+  };
+
+  let lastError;
+  for (const modelName of modelCandidates) {
+    try {
+      const chat = client.chats.create({
+        model: modelName,
+        config: {
+          ...generationConfig,
+          ...(systemMsg && { systemInstruction: systemMsg.content }),
+        },
+        history,
+      });
+      const result = await chat.sendMessage({ message: lastUser.content });
+      if (modelName !== preferred) {
+        process.env.GEMINI_MODEL = modelName;
+      }
+      return result.text.trim();
+    } catch (err) {
+      lastError = err;
+      const isModelMissing = /404|not found|not supported/i.test(String(err.message));
+      if (!isModelMissing) throw err;
+    }
+  }
+
+  throw lastError;
+}
+
 async function callAnthropic(messages, opts = {}) {
   // Swap in @anthropic-ai/sdk here when needed.
   // The message format below mirrors the OpenAI shape; translate as required.
@@ -48,6 +101,7 @@ async function callStub(messages, _opts = {}) {
 // ─── Provider dispatch table ──────────────────────────────────────────────
 const PROVIDERS = {
   openai: callOpenAI,
+  gemini: callGemini,
   anthropic: callAnthropic,
   stub: callStub,
 };
@@ -62,7 +116,7 @@ const PROVIDERS = {
 async function complete(messages, opts = {}) {
   const fn = PROVIDERS[PROVIDER];
   if (!fn) {
-    throw new Error(`Unknown LLM_PROVIDER: "${PROVIDER}". Valid values: openai, anthropic, stub`);
+    throw new Error(`Unknown LLM_PROVIDER: "${PROVIDER}". Valid values: openai, gemini, anthropic, stub`);
   }
   return fn(messages, opts);
 }
