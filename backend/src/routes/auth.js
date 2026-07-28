@@ -6,6 +6,11 @@ const authController = require('../controllers/authController');
 
 // ── Validation rules ────────────────────────────────────────────────────────
 const registerRules = [
+  body('username')
+    .isString()
+    .trim()
+    .isLength({ min: 2, max: 32 })
+    .withMessage('Username must be 2–32 characters'),
   body('email')
     .isEmail()
     .normalizeEmail()

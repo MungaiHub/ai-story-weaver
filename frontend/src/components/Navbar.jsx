@@ -23,7 +23,7 @@ export default function Navbar() {
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>
-              {user.email}
+              {user.username || user.email}
             </span>
             <Link to="/generate" className="btn btn-primary btn-sm">
               <PlusCircle size={14} />

@@ -6,15 +6,20 @@ const User = require('../models/User');
  */
 async function register(req, res, next) {
   try {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ error: 'Username already taken' });
+    }
+
     const passwordHash = await User.hashPassword(password);
-    const user = await User.create({ email, passwordHash });
+    const user = await User.create({ username, email, passwordHash });
 
     const token = signToken(user);
     return res.status(201).json({ token, user });
@@ -51,7 +56,7 @@ async function login(req, res, next) {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function signToken(user) {
   return jwt.sign(
-    { userId: user._id, email: user.email },
+    { userId: user._id, email: user.email, username: user.username },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );

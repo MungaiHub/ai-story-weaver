@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +25,7 @@ export default function AuthPage() {
       if (mode === 'login') {
         await login(email, password);
       } else {
-        await register(email, password);
+        await register(username, email, password);
       }
       navigate(from, { replace: true });
     } catch (err) {
@@ -30,6 +33,15 @@ export default function AuthPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function switchMode(next) {
+    setMode(next);
+    setError('');
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setShowPassword(false);
   }
 
   return (
@@ -47,6 +59,23 @@ export default function AuthPage() {
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
+          {mode === 'register' && (
+            <div className="form-group">
+              <label className="form-label" htmlFor="username">Username</label>
+              <input
+                id="username"
+                type="text"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                minLength={2}
+                maxLength={32}
+                placeholder="e.g. storyweaver42"
+              />
+            </div>
+          )}
+
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email</label>
             <input
@@ -63,17 +92,28 @@ export default function AuthPage() {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              maxLength={128}
-              placeholder={mode === 'login' ? '••••••••' : 'Min. 8 characters'}
-            />
+            <div className="password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={8}
+                maxLength={128}
+                placeholder={mode === 'login' ? '••••••••' : 'Min. 8 characters'}
+              />
+              <button
+                type="button"
+                className="password-eye"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -92,7 +132,7 @@ export default function AuthPage() {
           <button
             className="btn btn-ghost btn-sm"
             style={{ display: 'inline', padding: '0', border: 'none', color: 'var(--accent-light)' }}
-            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}
+            onClick={() => switchMode(mode === 'login' ? 'register' : 'login')}
           >
             {mode === 'login' ? 'Register' : 'Sign in'}
           </button>

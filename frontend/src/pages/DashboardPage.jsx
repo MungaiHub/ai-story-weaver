@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronRight, PlusCircle } from 'lucide-react';
+import { BookOpen, ChevronRight, PlusCircle, Lightbulb, Info } from 'lucide-react';
 import { sanitize } from '../utils/sanitize';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Dashboard fetches aren't in the current API spec (no GET /api/story list
   // endpoint). We detect this gracefully and show the empty state + CTA.
@@ -17,6 +19,59 @@ export default function DashboardPage() {
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
+      {/* ── Welcome banner ───────────────────────────────────────────── */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+          {user?.username ? `Welcome back, ${user.username} 👋` : 'Your Stories'}
+        </h1>
+        <p style={{ color: 'var(--muted)', fontSize: '0.88rem', marginTop: '0.3rem' }}>
+          Pick up where you left off, or start something new.
+        </p>
+      </div>
+
+      {/* ── Quick action cards ───────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <div
+          className="quick-card"
+          onClick={() => navigate('/generate')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && navigate('/generate')}
+        >
+          <PlusCircle size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>New Story</div>
+            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>Generate a new story with AI</div>
+          </div>
+        </div>
+        <div
+          className="quick-card"
+          onClick={() => navigate('/how-it-works')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && navigate('/how-it-works')}
+        >
+          <Lightbulb size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>How It Works</div>
+            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>Learn about AI story branching</div>
+          </div>
+        </div>
+        <div
+          className="quick-card"
+          onClick={() => navigate('/about')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && navigate('/about')}
+        >
+          <Info size={22} strokeWidth={1.5} style={{ color: 'var(--accent-light)' }} />
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>About</div>
+            <div style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>About this project</div>
+          </div>
+        </div>
+      </div>
+
       <div
         style={{
           display: 'flex',
@@ -25,7 +80,7 @@ export default function DashboardPage() {
           marginBottom: '1.5rem',
         }}
       >
-        <h1 style={{ fontSize: '1.4rem', fontWeight: 700 }}>Your Stories</h1>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Your Stories</h2>
         <button
           className="btn btn-primary btn-sm"
           onClick={() => navigate('/generate')}

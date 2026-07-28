@@ -37,8 +37,8 @@ function getToken() {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────
 export const authApi = {
-  register: (email, password) =>
-    request('POST', '/api/auth/register', { email, password }),
+  register: (username, email, password) =>
+    request('POST', '/api/auth/register', { username, email, password }),
 
   login: (email, password) =>
     request('POST', '/api/auth/login', { email, password }),

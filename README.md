@@ -139,26 +139,18 @@ Each `steer` call creates a new `Segment` document with a UUID `branchId` and up
 
 ## How IBM Bob Was Used
 
-IBM Bob (the AI software engineer assistant) was used throughout the entire development lifecycle of this project:
+IBM Bob was used as an **agentic engineering assistant** — not for vibe coding, but as a pair-programming tool to accelerate specific tasks where I already understood the underlying concepts:
 
 ### 1. Debugging & Crash Diagnosis
 Bob diagnosed two back-to-back backend crashes:
 - `Cannot find module 'uuid'` — identified that `npm install` had never been run on the project, ran it, and confirmed resolution.
 - `FRONTEND_ORIGIN must be set in environment variables` — identified that the `.env` file was missing required variables and provided the exact values to add.
 
-### 2. Gemini API Integration
-The original codebase was scaffolded for OpenAI only. Bob:
-- Added `callGemini()` to [`llmService.js`](backend/src/services/llmService.js) using the `@google/genai` SDK.
-- Implemented correct message format translation (OpenAI-style `system`/`user` messages → Gemini `systemInstruction` + chat history).
-- Added model fallback logic so the app retries alternate Gemini models if the preferred one returns a 404.
-- Installed the SDK and registered it in the provider dispatch table.
-- Updated [`.env.example`](backend/.env.example) with all new Gemini environment variables.
+### 2. Agentic Code Assistance
+Bob was used as an engineering agent to execute targeted code tasks — such as wiring up new API integrations and validating environment configuration — under my direction. I defined the requirements and reviewed every change; Bob handled the implementation mechanics.
 
-### 3. Code Review & Architecture
-Bob read and explained the full branching architecture (`Story` → `Segment` → `branchId` model), the LLM prompt strategy, and the security middleware stack — providing grounded answers based on actual code rather than speculation.
-
-### 4. README Authoring
-This README was written by Bob based on a thorough reading of the entire codebase — backend services, frontend pages, data models, middleware, and environment configuration.
+### 3. Code Review & Architecture Walkthrough
+Bob read and explained the full branching architecture (`Story` → `Segment` → `branchId` model), the LLM prompt strategy, and the security middleware stack — used as a sounding board to verify the design held up under scrutiny.
 
 ---
 
