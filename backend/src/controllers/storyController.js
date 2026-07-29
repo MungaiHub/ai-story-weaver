@@ -1,4 +1,21 @@
 const storyService = require('../services/storyService');
+const { StoryModel } = require('../models/Story');
+
+/**
+ * GET /api/story
+ * Returns all stories owned by the authenticated user, newest first.
+ */
+async function listStories(req, res, next) {
+  try {
+    const stories = await StoryModel.find({ owner: req.user.userId })
+      .sort({ createdAt: -1 })
+      .select('_id title genre theme segmentCount createdAt')
+      .lean();
+    return res.json({ stories });
+  } catch (err) {
+    return next(err);
+  }
+}
 
 /**
  * POST /api/story/generate
@@ -55,4 +72,4 @@ async function steer(req, res, next) {
   }
 }
 
-module.exports = { generate, getStory, steer };
+module.exports = { listStories, generate, getStory, steer };

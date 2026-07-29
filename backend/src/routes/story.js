@@ -53,6 +53,9 @@ const getStoryRules = [
 // All story routes require authentication
 router.use(requireAuth);
 
+// List all stories for the current user
+router.get('/', storyController.listStories);
+
 // Generate a new story — rate-limited
 router.post(
   '/generate',

@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AuthPage from './pages/AuthPage';
+import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import StoryPage from './pages/StoryPage';
 import GeneratePage from './pages/GeneratePage';
@@ -18,7 +19,13 @@ export default function App() {
         <Navbar />
         <div className="container">
           <Routes>
+            {/* Public routes */}
+            <Route path="/home" element={<HomePage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/about" element={<AboutPage />} />
+
+            {/* Protected routes */}
             <Route
               path="/"
               element={
@@ -43,23 +50,8 @@ export default function App() {
                 </RequireAuth>
               }
             />
-            <Route
-              path="/how-it-works"
-              element={
-                <RequireAuth>
-                  <HowItWorksPage />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <RequireAuth>
-                  <AboutPage />
-                </RequireAuth>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
+
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </div>
         <Footer />

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronRight, PlusCircle } from 'lucide-react';
+import { BookOpen, ChevronRight, PlusCircle, Calendar } from 'lucide-react';
 import { sanitize } from '../utils/sanitize';
 import { useAuth } from '../context/AuthContext';
+import { storyApi } from '../services/api';
 
 export default function DashboardPage() {
   const [stories, setStories] = useState([]);
@@ -12,7 +13,19 @@ export default function DashboardPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    setLoading(false);
+    let cancelled = false;
+    async function fetchStories() {
+      try {
+        const data = await storyApi.listStories();
+        if (!cancelled) setStories(data.stories);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchStories();
+    return () => { cancelled = true; };
   }, []);
 
   return (
@@ -91,6 +104,11 @@ export default function DashboardPage() {
                   <span className="pill">{sanitize(s.genre)}</span>
                   &nbsp;·&nbsp;
                   {sanitize(s.theme)}
+                </div>
+                <div className="story-list-meta" style={{ marginTop: '0.15rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Calendar size={11} />
+                  {new Date(s.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                  &nbsp;·&nbsp;{s.segmentCount} scene{s.segmentCount !== 1 ? 's' : ''}
                 </div>
               </div>
               <ChevronRight size={18} color="var(--muted)" />

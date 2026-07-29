@@ -46,6 +46,9 @@ export const authApi = {
 
 // ─── Stories ──────────────────────────────────────────────────────────────
 export const storyApi = {
+  listStories: () =>
+    request('GET', '/api/story', null, getToken()),
+
   generate: (theme, genre, plotBeats, segmentCount) =>
     request(
       'POST',
